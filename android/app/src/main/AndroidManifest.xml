@@ -1,0 +1,102 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.mycompany.qalqan_dsm">
+
+    <!-- Сетевые/аудио/foreground разрешения -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Overlay нужен только если реально используете поверх всех окон -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- ВАЖНО: специально не добавляем MANAGE_EXTERNAL_STORAGE
+         и старые READ/WRITE_EXTERNAL_STORAGE -->
+
+    <application
+        android:name="${applicationName}"
+        android:label="Qalqan"
+        android:icon="@mipmap/ic_launcher"
+        tools:ignore="DrawOverOtherApps">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/LaunchTheme"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode">
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <meta-data android:name="flutterEmbedding" android:value="2" />
+
+        <!-- background service -->
+        <service
+            android:name="id.flutter.plugins.flutter_background_service.BackgroundService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync|phoneCall" />
+
+        <receiver
+            android:name="id.flutter.plugins.flutter_background_service.BackgroundServiceBootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="id.flutter.plugins.flutter_background_service.BackgroundServiceReceiver"
+            android:exported="false" />
+
+        <!-- callkit services -->
+        <service
+            android:name="com.hiennv.flutter_callkit_incoming.OngoingNotificationService"
+            android:exported="false"
+            android:foregroundServiceType="phoneCall|microphone"
+            tools:replace="android:exported,android:foregroundServiceType" />
+
+        <service
+            android:name="com.triniwiz.fluttercallkitincoming.CallkitIncomingService"
+            android:exported="false"
+            android:foregroundServiceType="phoneCall|microphone" />
+
+        <receiver
+            android:name="com.triniwiz.fluttercallkitincoming.FlutterCallkitIncomingBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.triniwiz.fluttercallkitincoming.INCOMING_CALL" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+    <!-- queries (оставил ваш PROCESS_TEXT) -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
+</manifest>
